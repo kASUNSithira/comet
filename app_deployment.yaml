@@ -1,0 +1,47 @@
+--- 
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: comet-ui
+  namespace: comet-services
+spec: 
+  replicas: 1
+  selector:
+    matchLabels:
+      app: comet-ui
+  template: 
+    metadata: 
+      labels: 
+        app: comet-ui
+    spec: 
+      containers: 
+        - image: "192.168.1.24:5000/comet-ui:latest"
+          imagePullPolicy: Always
+          name: comet-ui-container
+          ports: 
+            - containerPort: 80
+            - containerPort: 443
+      
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: comet-ui
+  namespace: comet-services
+spec:
+  selector:
+    app: comet-ui
+  ports:
+  - protocol: TCP
+    port: 9483
+    targetPort: 80
+#    nodePort: 8113
+#  clusterIP: 10.0.171.239
+  loadBalancerIP: 192.168.1.14
+  externalIPs:
+  - 192.168.1.11
+  type: LoadBalancer
+status:
+  loadBalancer:
+    ingress:
+    - ip: 192.168.1.11
